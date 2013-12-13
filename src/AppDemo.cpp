@@ -175,8 +175,8 @@ void AppDemo::initDemo()
 	mSceneMgr->setFog(Ogre::FOG_EXP2,Ogre::ColourValue(0.8431f,0.941f,1.0f),0.0002f);
 	//Camera
 	mCamera = mSceneMgr->createCamera("DemoCamera");
-	mCamera->setPosition(0.0f,30.0f,111.96152422706631880582339024518f);
-	mCamera->lookAt(0.0,0.0,0.0);
+	mCamera->setPosition(0.0f,20.0f,111.96152422706631880582339024518f);
+	mCamera->lookAt(0.0,15.0,0.0);
  	mCamera->setNearClipDistance(1);
 
 	//ViewPort
@@ -208,17 +208,17 @@ void AppDemo::createScene(void)
   	l->setDiffuseColour(Ogre::ColourValue(1.0,1.0,1.0));
 	l->setSpecularColour(Ogre::ColourValue(1.0,1.0,1.0)); 
 	//video texture
-	mVideoCapture = cvCreateFileCapture("E:\\Record_2013_12_10_01_44_24_101.avi");
+	mVideoCapture = cvCreateFileCapture("media\\Video\\Record_2013_12_10_01_44_24_101.avi");
 	createVideoTexture();
 
 	//implememting a video screen
 	mVideoScreen = new Ogre::Rectangle2D(true);
-	mVideoScreen->setCorners(-1.0f, 0.75f, 1.0f, -0.75f);
+	//mVideoScreen->setCorners(-1.0f, 0.75f, 1.0f, -0.75f);
+	mVideoScreen->setCorners(-0.0f, 1.0f, 1.0f, -0.0f);
 	mVideoScreen->setBoundingBox(Ogre::AxisAlignedBox(-100000.0f * Ogre::Vector3::UNIT_SCALE, 100000.0f * Ogre::Vector3::UNIT_SCALE));
 	mVideoScreen->setMaterial(material->getName());
 	Ogre::SceneNode *videoScreenNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("VideoScreenNode");
 	videoScreenNode->attachObject(mVideoScreen);
-	
 }
 
 void AppDemo::run()
@@ -352,8 +352,7 @@ void AppDemo::updateVodeoTexture()
 
 	cv::Mat img(mVideoFrame, 0);
 	mImage = img;
-	//mImage = cv::imread("E:\\W020090716305598635555.JPG");
-	cv::imshow("Display Window",mImage);
+	//cv::imshow("Display Window",mImage);
 	std::vector<cv::Rect> found, found_filtered;
 	cv::HOGDescriptor people_dectect_hog;
 	people_dectect_hog.setSVMDetector(cv::HOGDescriptor::getDefaultPeopleDetector());
