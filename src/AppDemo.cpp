@@ -14,8 +14,8 @@ AppDemo::AppDemo()
 	mRoot(0),
 	mRenderWnd(0),
 	mInputMgr(0),
-	mSceneMgr(0),
-	mCamera(0),
+	//mSceneMgr(0),
+	//mCamera(0),
 	mTimer(0),
 	mKeyboard(0),
 	mMouse(0),
@@ -30,7 +30,7 @@ AppDemo::~AppDemo()
 {
 	delete UIManager::getSingletonPtr();
 	cvReleaseCapture(&mVideoCapture);
-	cvDestroyWindow("video");
+	//cvDestroyWindow("video");
 
  	mRenderWnd->removeAllViewports();
    
@@ -128,18 +128,10 @@ void AppDemo::setupResources(void)
 
 void AppDemo::windowResized(Ogre::RenderWindow* rw)
 {
-/*  这个让后面的子面板去执行了
+	//这个让后面的子面板去执行了
  	mMouse->getMouseState().width  = rw->getWidth();
 	mMouse->getMouseState().height = rw->getHeight();
-	UIManager::getSingletonPtr()->windowResized(rw);*/
-	unsigned int width, height, depth;
-	int left, top;
-	rw->getMetrics(width, height, depth, left, top);
-
-	const OIS::MouseState &ms = mMouse->getMouseState();
-	ms.width = width;
-	ms.height = height;
-
+	UIManager::getSingletonPtr()->windowResized(rw);
 }
 
 bool AppDemo::keyPressed(const OIS::KeyEvent &keyEvt)
@@ -147,6 +139,7 @@ bool AppDemo::keyPressed(const OIS::KeyEvent &keyEvt)
 	if(mKeyboard->isKeyDown(OIS::KC_SYSRQ))   // take a screenshot
     {
         mRenderWnd->writeContentsToTimestampedFile("Screenshot_", ".jpg");
+		return true;
     }
 	else if(keyEvt.key == OIS::KC_F5)   // refresh all textures
 	{
@@ -187,7 +180,7 @@ void AppDemo::initDemo()
   	vp->setBackgroundColour(Ogre::ColourValue(0.8431f,0.941f,1.0f));
 
 	new UIManager();
-	UIManager::getSingletonPtr()->bootUI(mRenderWnd,mSceneMgr);
+	UIManager::getSingletonPtr()->bootUI(mRenderWnd, mSceneMgr);
 }
 
 void AppDemo::createScene(void)
@@ -208,7 +201,7 @@ void AppDemo::createScene(void)
   	l->setDiffuseColour(Ogre::ColourValue(1.0,1.0,1.0));
 	l->setSpecularColour(Ogre::ColourValue(1.0,1.0,1.0)); 
 	//video texture
-	mVideoCapture = cvCreateFileCapture("media\\Video\\Record_2013_12_10_01_44_24_101.avi");
+	mVideoCapture = cvCreateFileCapture("media\\Video\\Record_2013_12_06_15_24_23_896.avi");
 	createVideoTexture();
 
 	//implememting a video screen
@@ -230,10 +223,10 @@ void AppDemo::run()
 	initDemo();
 	createScene();
 	createFrameListener();
-	double timeSinceLastFrame = 1.0;
+	int timeSinceLastFrame = 1;
 	int startTime = 0;
 
-	mRoot->startRendering();
+	//mRoot->startRendering();
 
 	while(!mShutDown)
 	{
@@ -242,7 +235,7 @@ void AppDemo::run()
 
 		Ogre::WindowEventUtilities::messagePump();
 		
-		if(mRenderWnd->isActive())
+		//if(mRenderWnd->isActive())
 		{
 	 		startTime = mTimer->getMillisecondsCPU();
 
@@ -252,10 +245,10 @@ void AppDemo::run()
 			mRoot->renderOneFrame();
   			timeSinceLastFrame = (mTimer->getMillisecondsCPU() - startTime)/1000.0f;
 		}
-		else
-		{
-	         Sleep(50);
-  		}
+	//	else
+		//{
+	     //    Sleep(50);
+  		//}
 	}
   	mLog->logMessage("Main Loop Quit");
 }
@@ -264,10 +257,43 @@ bool AppDemo::mouseMoved(const OIS::MouseEvent &evt)
 {
 	MyGUI::PointerManager::getInstance().setVisible(false);
     bool ret = MyGUI::InputManager::getInstance().injectMouseMove(evt.state.X.abs,evt.state.Y.abs,evt.state.Z.abs);
-	
     if(ret) return true;
 
+/*
+	if (evt.state.buttonDown(OIS::MB_Middle))
+	{
+		static float pitchValue = 15;
+		static float yawValue = 0; 
+		yawValue += evt.state.X.rel * 0.2;
+		pitchValue += evt.state.Y.rel * 0.2;
+		mCamera->moveRelative(Ogre::Vector3(0, 0, -50));
+		mCamera->setOrientation(Ogre::Quaternion::IDENTITY);
+		mCamera->pitch(Ogre::Degree(-pitchValue));
+		mCamera->yaw(Ogre::Degree(-yawValue));
+		mCamera->moveRelative(Ogre::Vector3(0.0, 0.0, 50));
+	}
 
+	if (evt.state.buttonDown(OIS::MB_Right))
+	{
+		mCamera->moveRelative(Ogre::Vector3(-evt.state.X.rel * 0.5, evt.state.Y.rel * 0.5, 0));
+	}
+
+	if (evt.state.Z.rel != 0)
+	{
+		float movRel = evt.state.Z.rel / 50.f;
+		mCamera->moveRelative(Ogre::Vector3(0.0f, 0.0f, -100));
+		Ogre::Vector3 target = mCamera->getPosition();
+		mCamera->moveRelative(Ogre::Vector3(0.0f, 0.0f, 100));
+
+		Ogre::Vector3 v = (mCamera->getPosition() - target).normalisedCopy() * movRel;
+		Ogre::Vector3 newPos = mCamera->getPosition() - v;
+		Ogre::Vector3 camPos = mCamera->getPosition();
+
+		float val = newPos.dotProduct(camPos);
+
+		if (val > 0)
+			mCamera->move(-v);
+	}*/
 	return true;
 }
 
@@ -277,8 +303,7 @@ bool AppDemo::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 	if(!flag)
 	{
 		return false;
-	}
-		
+	}	
  	return true;
 }
 
@@ -289,6 +314,7 @@ bool AppDemo::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 	{
 		return false;
 	}
+
  	return true;
 }
 
@@ -353,6 +379,8 @@ void AppDemo::updateVodeoTexture()
 	cv::Mat img(mVideoFrame, 0);
 	mImage = img;
 	//cv::imshow("Display Window",mImage);
+
+/*
 	std::vector<cv::Rect> found, found_filtered;
 	cv::HOGDescriptor people_dectect_hog;
 	people_dectect_hog.setSVMDetector(cv::HOGDescriptor::getDefaultPeopleDetector());
@@ -377,8 +405,8 @@ void AppDemo::updateVodeoTexture()
 		r.y += cvRound(r.height*0.07);
 		r.height = cvRound(r.height*0.8);
 		cv::rectangle(mImage, r.tl(), r.br(), cv::Scalar(0, 255, 0), 3);	
-	}
-	//cv::imshow("Display Window",mImage);
+	}*/
+
 	// Lock the pixel buffer
 	unsigned char* buffer = static_cast<unsigned char*>(pixelBuffer->lock(0, mVideoFrame->width*mVideoFrame->height*4, Ogre::HardwareBuffer::HBL_DISCARD) );
 	//const PixelBox &pb = pixelBuffer->getCurrentLock();

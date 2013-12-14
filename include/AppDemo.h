@@ -91,8 +91,6 @@ namespace RssApp
 		Ogre::SceneManager*			mSceneMgr;
 		Ogre::Camera*				mCamera;
 
-		Ogre::Camera*               mCameraAux;
-
 		std::string					mWorkDirectory;
 
 		bool				 mShutDown;
